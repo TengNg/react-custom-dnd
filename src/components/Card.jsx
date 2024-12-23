@@ -1,8 +1,14 @@
 import useDragAndDrop from "../hooks/useDragAndDrop";
 
 export default function Card({ card }) {
-    const { draggingCard, handleDrop, handleDragOver, handleDragStart } =
-        useDragAndDrop();
+    const {
+        hoveredCard,
+        setHoveredCard,
+        draggingCard,
+        handleDrop,
+        handleDragOver,
+        handleDragStart,
+    } = useDragAndDrop();
 
     const isDragging = draggingCard?.id === card.id;
 
@@ -10,19 +16,26 @@ export default function Card({ card }) {
         <div
             data-item-type="card"
             draggable
-            onDragStart={() => handleDragStart(card)}
-            onDragOver={(e) => handleDragOver(e)}
-            onDrop={(e) => handleDrop(e, card)}
+            onDragStart={(e) => handleDragStart(e, card)}
+            onDragOver={(e) => handleDragOver(e, card)}
+            onDrop={(e) => {
+                handleDrop(e, card);
+                setHoveredCard({});
+            }}
             style={{
-                padding: "10px",
-                margin: "5px 0",
-                backgroundColor: "#f0f0f0",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                borderColor: isDragging ? "blue" : "#ccc",
-                textAlign: "center",
-                cursor: "grab",
+                borderTopColor: isDragging ? "blue" : "#ccc",
+                borderBottomColor: isDragging ? "blue" : "#ccc",
+                borderLeftColor: isDragging ? "blue" : "#ccc",
+                borderRightColor: isDragging ? "blue" : "#ccc",
                 opacity: isDragging ? 0.5 : 1,
+                ...(hoveredCard?.id === card.id &&
+                hoveredCard.position === "above"
+                    ? { borderTopColor: "blue" }
+                    : {}),
+                ...(hoveredCard?.id === card.id &&
+                hoveredCard.position === "below"
+                    ? { borderBottomColor: "blue" }
+                    : {}),
             }}
         >
             {card.content} [{card.id}]

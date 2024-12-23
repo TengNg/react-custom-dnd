@@ -7,17 +7,73 @@ export function DragAndDropContextProvider({ children }) {
     const [lists, setLists] = useState(items);
     const [draggingCard, setDraggingCard] = useState(null);
     const [draggingList, setDraggingList] = useState(null);
+    const [hoveredCard, setHoveredCard] = useState({});
+    const [hoveredList, setHoveredList] = useState({});
 
-    function handleDragStartList(list) {
-        setDraggingList(list);
-    }
-
-    function handleDragStart(card) {
+    function handleDragStart(e, card) {
         setDraggingCard(card);
+        setHoveredCard({});
+
+        // hide the default drag image for better control
+        const img = new Image();
+        img.src = "";
+        e.dataTransfer.setDragImage(img, 0, 0);
     }
 
-    function handleDragOver(e) {
+    function handleDragStartList(e, list) {
+        setDraggingList(list);
+        setHoveredList({});
+
+        // hide the default drag image for better control
+        const img = new Image();
+        img.src = "";
+        e.dataTransfer.setDragImage(img, 0, 0);
+    }
+
+    function handleDragOver(e, card) {
         e.preventDefault();
+
+        if (!draggingCard || draggingCard.id === card.id) {
+            return;
+        }
+
+        const cardRect = e.currentTarget.getBoundingClientRect();
+        const middleY = cardRect.top + cardRect.height / 2;
+
+        if (e.clientY < middleY) {
+            setHoveredCard({
+                id: card.id,
+                position: "above",
+            });
+        } else {
+            setHoveredCard({
+                id: card.id,
+                position: "below",
+            });
+        }
+    }
+
+    function handleDragOverList(e, list) {
+        e.preventDefault();
+
+        if (draggingCard || draggingList.id === list.id) {
+            return;
+        }
+
+        const listRect = e.currentTarget.getBoundingClientRect();
+        const middleX = listRect.top + listRect.height / 2;
+
+        if (e.clientX < middleX) {
+            setHoveredList({
+                id: list.id,
+                position: "left",
+            });
+        } else {
+            setHoveredList({
+                id: list.id,
+                position: "right",
+            });
+        }
     }
 
     function handleDrop(e, targetCard) {
@@ -200,6 +256,11 @@ export function DragAndDropContextProvider({ children }) {
                 draggingCard,
                 setDraggingCard,
 
+                hoveredCard,
+                hoveredList,
+                setHoveredCard,
+                setHoveredList,
+
                 draggingList,
                 setDraggingList,
 
@@ -207,6 +268,8 @@ export function DragAndDropContextProvider({ children }) {
                 handleDragStart,
 
                 handleDragOver,
+                handleDragOverList,
+
                 handleDrop,
                 handleDropOnList,
             }}

@@ -5,15 +5,7 @@ export default function Lists() {
     const { lists } = useDragAndDrop();
 
     return (
-        <div
-            style={{
-                display: "flex",
-                width: "100%",
-                flexWrap: "nowrap",
-                gap: "20px",
-                overflow: "auto",
-            }}
-        >
+        <div className="list-container">
             {lists.map((list) => {
                 return <List key={list.id} list={list} />;
             })}

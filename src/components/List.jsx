@@ -2,24 +2,37 @@ import useDragAndDrop from "../hooks/useDragAndDrop";
 import Card from "./Card";
 
 export default function List({ list }) {
-    const { handleDragOver, handleDropOnList, handleDragStartList } =
-        useDragAndDrop();
+    const {
+        hoveredList,
+        setHoveredList,
+        setHoveredCard,
+        handleDragOverList,
+        handleDropOnList,
+        handleDragStartList,
+    } = useDragAndDrop();
 
     return (
         <div
+            data-list-id={list.id}
             data-item-type="list"
             draggable
-            onDragStart={() => handleDragStartList(list)}
-            onDragOver={(e) => handleDragOver(e)}
-            onDrop={(e) => handleDropOnList(e, list)}
+            onDragStart={(e) => handleDragStartList(e, list)}
+            onDragOver={(e) => handleDragOverList(e, list)}
+            onDrop={(e) => {
+                handleDropOnList(e, list);
+                setHoveredList({});
+                setHoveredCard({});
+            }}
+            className="list-item"
             style={{
-                width: "250px",
-                minWidth: "250px",
-                height: "300px",
-                padding: "20px",
-                border: "1px solid #ccc",
-                backgroundColor: "#f9f9f9",
-                overflow: "auto",
+                ...(hoveredList?.id === list.id &&
+                hoveredList.position === "left"
+                    ? { borderLeftColor: "blue" }
+                    : {}),
+                ...(hoveredList?.id === list.id &&
+                hoveredList.position === "right"
+                    ? { borderRightColor: "blue" }
+                    : {}),
             }}
         >
             <div
@@ -29,6 +42,7 @@ export default function List({ list }) {
                     wordBreak: "break-all",
                     hyphens: "auto",
                     whiteSpace: "pre-wrap",
+                    cursor: "grab",
                 }}
             >
                 {list.title}
@@ -36,6 +50,7 @@ export default function List({ list }) {
             <div
                 style={{
                     border: "1px solid gray",
+                    borderRadius: "5px",
                     height: "250px",
                     overflow: "scroll",
                     padding: "10px",
