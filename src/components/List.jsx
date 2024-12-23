@@ -2,24 +2,47 @@ import useDragAndDrop from "../hooks/useDragAndDrop";
 import Card from "./Card";
 
 export default function List({ list }) {
-    const { handleDragOver, handleDropOnList, handleDragStartList } =
-        useDragAndDrop();
+    const {
+        hoveredList,
+        setHoveredList,
+        handleDragOverList,
+        handleDropOnList,
+        handleDragStartList,
+    } = useDragAndDrop();
 
     return (
         <div
             data-item-type="list"
             draggable
-            onDragStart={() => handleDragStartList(list)}
-            onDragOver={(e) => handleDragOver(e)}
-            onDrop={(e) => handleDropOnList(e, list)}
+            onDragStart={(e) => handleDragStartList(e, list)}
+            onDragOver={(e) => handleDragOverList(e, list)}
+            onDrop={(e) => {
+                handleDropOnList(e, list);
+                setHoveredList({});
+            }}
             style={{
+                transform: "none",
                 width: "250px",
                 minWidth: "250px",
                 height: "300px",
                 padding: "20px",
-                border: "1px solid #ccc",
                 backgroundColor: "#f9f9f9",
                 overflow: "auto",
+                borderWidth: "2px",
+                borderStyle: "solid",
+                borderRadius: "5px",
+                borderTopColor: "gray",
+                borderBottomColor: "gray",
+                borderLeftColor: "gray",
+                borderRightColor: "gray",
+                ...(hoveredList?.id === list.id &&
+                hoveredList.position === "left"
+                    ? { borderLeftColor: "blue" }
+                    : {}),
+                ...(hoveredList?.id === list.id &&
+                hoveredList.position === "right"
+                    ? { borderRightColor: "blue" }
+                    : {}),
             }}
         >
             <div
